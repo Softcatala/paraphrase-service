@@ -18,7 +18,7 @@
 # Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
 import logging
 import logging.handlers
@@ -50,8 +50,6 @@ def init_logging():
 
 
 def do_inference(sentence):
-    model_name = decoding_params["model_name"]
-
     models_paths = os.environ.get("PARAPHRASE_MODELS", "/srv/models")
     model_path = os.path.join(models_paths, "outputs.exp209/")
 
@@ -67,10 +65,10 @@ def json_answer(data, status=200):
     return resp
 
 
-def _inference():
+def _inference(values):
     text = values["text"]
     logging.debug(f"input text: '{text}'")
-    paraphrases = do_inference(sentence)
+    paraphrases = do_inference(text)
 
     entries = []
     for paraphrase in paraphrases:
@@ -82,15 +80,14 @@ def _inference():
     return json_answer(entries)
 
 
-@app.route("/check", methods=["POST"])
-def punctuation_api_post():
+@app.route("/paraphrase", methods=["POST"])
+def paraphrase_api_post():
     return _inference(request.form)
 
 
-@app.route("/check", methods=["GET"])
-def punctuation_api_get():
+@app.route("/paraphrase", methods=["GET"])
+def paraphrase_api_get():
     return _inference(request.args)
-
 
 @app.route("/hello", methods=["GET"])
 def hello():
