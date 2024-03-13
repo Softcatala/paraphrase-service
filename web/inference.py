@@ -37,7 +37,7 @@ class Inference:
         device = "cpu"
 
         model = models.get(model_name)
-#        print(f"model_name: {model_name}")
+        print(f"model_name: {model_name}")
         if not model:
             model = ctranslate2.Translator(model_name)
             models[model_name] = model

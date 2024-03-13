@@ -18,12 +18,13 @@
 # Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-from flask import Flask, request
+from flask import Flask, request, Response
 from flask_cors import CORS
 import logging
 import logging.handlers
 import os
 from inference import Inference
+import json
 
 app = Flask(__name__)
 CORS(app)
@@ -49,11 +50,10 @@ def init_logging():
     logger.addHandler(console)
 
 
-def do_inference(sentence):
+def do_inference(sentence, temperature):
     models_paths = os.environ.get("PARAPHRASE_MODELS", "/srv/models")
-    model_path = os.path.join(models_paths, "outputs.exp209/")
-
-    temperature = 1
+    model_path = os.path.join(models_paths, "outputs.exp303.ct2/")
+    print(f"model_path: {model_path}")
     paraphrases, _ = Inference().get_paraphrases(model_path, sentence, temperature)
     return paraphrases
 
@@ -67,10 +67,18 @@ def json_answer(data, status=200):
 
 def _inference(values):
     text = values["text"]
+    temperature = float(values["temperature"]) if 'temperature' in values else float(0)
+    
     logging.debug(f"input text: '{text}'")
-    paraphrases = do_inference(text)
+    paraphrases = do_inference(text, temperature)
 
     entries = []
+
+    entry = {}
+    entry["type"] = "original"
+    entry["proposal"] = text     
+    entries.append(entry)
+    
     for paraphrase in paraphrases:
         entry = {}
         entry["type"] = "paraphrase"
