@@ -18,31 +18,46 @@
 # Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-from flask import Flask, request, Response
+from flask import Flask
 from flask_cors import CORS
-import json
-import os
-import time
 import logging
 import logging.handlers
-
+import os
 
 app = Flask(__name__)
 CORS(app)
-@app.route('/check', methods=['GET'])
-def punctuation_api_get():
-    return _punctuation_api(request.args)
 
-@app.route('/hello', methods=['GET'])
+
+def init_logging():
+    LOGDIR = os.environ.get("LOGDIR", "")
+    LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
+    logger = logging.getLogger()
+    logfile = os.path.join(LOGDIR, "paraphrase-service.log")
+    hdlr = logging.handlers.RotatingFileHandler(
+        logfile, maxBytes=1024 * 1024, backupCount=1
+    )
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    hdlr.setFormatter(formatter)
+    logger.addHandler(hdlr)
+    logger.setLevel(LOGLEVEL)
+
+    console = logging.StreamHandler()
+    console.setLevel(LOGLEVEL)
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    console.setFormatter(formatter)
+    logger.addHandler(console)
+
+
+@app.route("/hello", methods=["GET"])
 def hello():
     return "Hello"
-  
+
+
 def init():
     init_logging()
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.debug = True
     init()
     app.run()
