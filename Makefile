@@ -1,0 +1,19 @@
+build-all: docker-build
+
+docker-build:
+	docker build -t paraphrase-service . -f docker/dockerfile;
+
+docker-run:
+	docker run -it --rm -p 8000:8000 paraphrase-service;
+
+download_models_req:
+	pip3 install -r requirements-modelconv.txt
+	
+MODEL_DIR=outputs.exp209
+
+download_models:
+	git clone --depth=1 https://gitlab.softcatala.org/jmas/paraphrase-models.git models.pt/ && cd models.pt/ && git lfs pull
+	PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python ct2-transformers-converter --force --model models.pt/${MODEL_DIR} --output_dir models/${MODEL_DIR} --quantization int8
+	cp models.pt/${MODEL_DIR}/spiece.model models/${MODEL_DIR}
+	cp models.pt/${MODEL_DIR}/tokenizer_config.json models/${MODEL_DIR}
+
