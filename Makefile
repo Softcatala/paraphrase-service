@@ -13,8 +13,6 @@ MODEL_DIR=outputs.exp303.ct2
 
 download_models:
 	git clone --depth=1 https://gitlab.softcatala.org/jmas/paraphrase-models.git models.pt/ && cd models.pt/ && git lfs pull
-
-copy_model:    
 	mkdir -p models/${MODEL_DIR}    
 	cp models.pt/${MODEL_DIR}/* models/${MODEL_DIR}
 
