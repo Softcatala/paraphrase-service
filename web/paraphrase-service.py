@@ -23,6 +23,7 @@ from flask_cors import CORS
 import logging
 import logging.handlers
 import os
+from inference import Inference
 
 app = Flask(__name__)
 CORS(app)
@@ -46,6 +47,49 @@ def init_logging():
     formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
     console.setFormatter(formatter)
     logger.addHandler(console)
+
+
+def do_inference(sentence):
+    model_name = decoding_params["model_name"]
+
+    models_paths = os.environ.get("PARAPHRASE_MODELS", "/srv/models")
+    model_path = os.path.join(models_paths, "outputs.exp209/")
+
+    temperature = 1
+    paraphrases, _ = Inference().get_paraphrases(model_path, sentence, temperature)
+    return paraphrases
+
+
+def json_answer(data, status=200):
+    json_data = json.dumps(data, indent=4, separators=(",", ": "))
+    resp = Response(json_data, mimetype="application/json", status=status)
+    resp.headers["Access-Control-Allow-Origin"] = "*"
+    return resp
+
+
+def _inference():
+    text = values["text"]
+    logging.debug(f"input text: '{text}'")
+    paraphrases = do_inference(sentence)
+
+    entries = []
+    for paraphrase in paraphrases:
+        entry = {}
+        entry["type"] = "paraphrase"
+        entry["proposal"] = paraphrase
+        entries.append(entry)
+
+    return json_answer(entries)
+
+
+@app.route("/check", methods=["POST"])
+def punctuation_api_post():
+    return _inference(request.form)
+
+
+@app.route("/check", methods=["GET"])
+def punctuation_api_get():
+    return _inference(request.args)
 
 
 @app.route("/hello", methods=["GET"])
