@@ -32,7 +32,7 @@ CORS(app)
 
 def init_logging():
     LOGDIR = os.environ.get("LOGDIR", "")
-    LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
+    LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG").upper()
     logger = logging.getLogger()
     logfile = os.path.join(LOGDIR, "paraphrase-service.log")
     hdlr = logging.handlers.RotatingFileHandler(
@@ -53,7 +53,7 @@ def init_logging():
 def do_inference(sentence, temperature):
     models_paths = os.environ.get("PARAPHRASE_MODELS", "/srv/models")
     model_path = os.path.join(models_paths, "outputs.exp303.ct2/")
-    print(f"model_path: {model_path}")
+    logging.debug(f"input text: '{sentence}' with temperature: {temperature}")
     paraphrases, _ = Inference().get_paraphrases(model_path, sentence, temperature)
     return paraphrases
 
@@ -69,7 +69,6 @@ def _inference(values):
     text = values["text"]
     temperature = float(values["temperature"]) if 'temperature' in values else float(0)
     
-    logging.debug(f"input text: '{text}'")
     paraphrases = do_inference(text, temperature)
 
     entries = []
