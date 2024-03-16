@@ -2,6 +2,7 @@ build-all: docker-build
 
 docker-build:
 	docker build -t paraphrase-service . -f docker/dockerfile;
+	docker image ls | grep 	paraphrase-service
 
 docker-run:
 	docker run -it --rm -p 8000:8000 paraphrase-service;
