@@ -1,7 +1,7 @@
 build-all: docker-build
 
 docker-build:
-	docker build --no-cache -t paraphrase-service . -f docker/dockerfile;
+	docker build -t paraphrase-service . -f docker/dockerfile;
 	docker image ls | grep 	paraphrase-service
 
 docker-run:
