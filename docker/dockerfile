@@ -1,16 +1,14 @@
 FROM python:3.12.2-bookworm as models
-RUN apt-get update && apt-get install git git-lfs make protobuf-compiler -y
+RUN apt-get update && apt-get install git make -y
 
 COPY Makefile /srv/
 WORKDIR /srv
 
-COPY requirements-modelconv.txt /srv/
 RUN make download_models
-
 
 FROM python:3.12.2-bookworm
 RUN apt-get update && apt-get install python3-dev -y
-COPY --from=models /srv/models/ /srv/models/
+COPY --from=models /srv/model/ /srv/model/
 
 COPY requirements.txt /srv/
 RUN pip install -r /srv/requirements.txt

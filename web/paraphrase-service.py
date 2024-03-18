@@ -51,8 +51,7 @@ def init_logging():
 
 
 def do_inference(sentence, temperature):
-    models_paths = os.environ.get("PARAPHRASE_MODELS", "/srv/models")
-    model_path = os.path.join(models_paths, "outputs.exp303.ct2/")
+    model_path = os.environ.get("PARAPHRASE_MODELS", "/srv/model/")
     logging.debug(f"input text: '{sentence}' with temperature: {temperature}")
     paraphrases, _ = Inference().get_paraphrases(model_path, sentence, temperature)
     return paraphrases
