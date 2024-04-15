@@ -4,7 +4,7 @@ docker-build:
 	docker build -t paraphrase-service . -f docker/dockerfile;
 	docker image ls | grep 	paraphrase-service
 
-docker-run:
+docker-run: docker-build
 	docker run -it --rm -p 8000:8000 paraphrase-service;
 
 download_models:
