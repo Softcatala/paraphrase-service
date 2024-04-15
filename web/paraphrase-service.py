@@ -65,6 +65,13 @@ def json_answer(data, status=200):
 
 
 def _inference(values):
+
+    if "text" not in values:
+        result = {}
+        result['error'] = "No s'ha especificat el paràmetre 'text'"
+        logging.debug(f"/_inference/ {result['error']}")
+        return json_answer(result, 404)
+
     text = values["text"]
     temperature = float(values["temperature"]) if 'temperature' in values else float(0)
     
@@ -88,7 +95,7 @@ def _inference(values):
 
 @app.route("/paraphrase", methods=["POST"])
 def paraphrase_api_post():
-    return _inference(request.form)
+    return _inference(request.json)
 
 
 @app.route("/paraphrase", methods=["GET"])
