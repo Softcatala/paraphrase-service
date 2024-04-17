@@ -25,6 +25,7 @@ import logging.handlers
 import os
 from inference import Inference
 import json
+import time
 
 app = Flask(__name__)
 CORS(app)
@@ -52,7 +53,6 @@ def init_logging():
 
 def do_inference(sentence, temperature):
     model_path = os.environ.get("PARAPHRASE_MODELS", "/srv/model/")
-    logging.debug(f"input text: '{sentence}' with temperature: {temperature}")
     paraphrases, _ = Inference().get_paraphrases(model_path, sentence, temperature)
     return paraphrases
 
@@ -72,6 +72,7 @@ def _inference(values):
         logging.debug(f"/_inference/ {result['error']}")
         return json_answer(result, 404)
 
+    start_time = time.time()
     text = values["text"]
     temperature = float(values["temperature"]) if 'temperature' in values else float(0)
     
@@ -90,6 +91,8 @@ def _inference(values):
         entry["proposal"] = paraphrase
         entries.append(entry)
 
+    elapsed_time = time.time() - start_time
+    logging.debug(f"/paraphrase for '{text}' - time: {elapsed_time:.2f}s")
     return json_answer(entries)
 
 

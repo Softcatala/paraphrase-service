@@ -2,12 +2,30 @@ import transformers
 import datetime
 import logging
 import ctranslate2
+import os
 
 tokenizers = {}
 models = {}
 
 
 class Inference:
+    INTER_THREADS = 'CTRANSLATE_INTER_THREADS'
+    INTRA_THREADS = 'CTRANSLATE_INTRA_THREADS'
+    DEVICE = 'DEVICE'
+
+    def __init__(self):
+        if self.INTER_THREADS in os.environ:
+            self.inter_threads = int(os.environ[self.INTER_THREADS])
+        else:
+            self.inter_threads = 1
+
+        if self.INTRA_THREADS in os.environ:
+            self.intra_threads = int(os.environ[self.INTRA_THREADS])
+        else:
+            self.intra_threads = 4
+
+        self.device = os.environ.get(self.DEVICE, "cpu")
+
     def _discard_recommendations(self, original, proposal):
         proposal = proposal.lower()
         original = original.lower()
@@ -37,17 +55,16 @@ class Inference:
         device = "cpu"
 
         model = models.get(model_name)
-        print(f"model_name: {model_name}")
         if not model:
-            model = ctranslate2.Translator(model_name)
+            model = ctranslate2.Translator(model_name, device = self.device, inter_threads = self.inter_threads, intra_threads = self.intra_threads)
             models[model_name] = model
-            print(f"Loaded model: {model_name}")
+            logging.debug(f"device: {self.device}, inter_threads: {self.inter_threads}, intra_threads: {self.intra_threads}, model_name: {model_name}")
 
         tokenizer = tokenizers.get(model_name)
         if not tokenizer:
             tokenizer = transformers.AutoTokenizer.from_pretrained(model_name)
             tokenizers[model_name] = tokenizer
-            print(f"Loaded tokenizer: {model_name}")
+            logging.debug(f"Loaded tokenizer: {model_name}")
 
         outputs = []
         discarded = 0
