@@ -1,7 +1,7 @@
 flask==3.0.2
 flask_cors==4.0.0
 ctranslate2==3.24
-gunicorn==21.2
+gunicorn==22.0.0
 transformers==4.38.2
 sentencepiece==0.2.0
 protobuf
