@@ -7,6 +7,9 @@ fi
 
 echo "Doing test on URL:" $URL
 
-wrk -t1 -c1 -d 10s -s post-paraphrase.form.lua $URL
+TIMEOUT=10s
+CLIENTS=2
+TEST_TIME=30s
+wrk -t1 -T$TIMEOUT -c$CLIENTS -d $TEST_TIME -s post-paraphrase.form.lua $URL
 
 
