@@ -8,4 +8,5 @@ docker-run: docker-build
 	docker run -it --rm -p 8000:8000 paraphrase-service;
 
 download_models:
-	git clone --depth=1 https://gitlab.softcatala.org/jmas/paraphrase-service-model /srv/model
+	wget -O ct2.zip https://gitlab.softcatala.org/nous-projectes/paraphrase-training/-/package_files/39/download
+	mkdir -p /srv/model/ && unzip ct2.zip -d /srv/model/
