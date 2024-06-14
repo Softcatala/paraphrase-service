@@ -95,7 +95,7 @@ class Inference:
                 self._discard_recommendations(sentence, generated_sent) is False
                 and generated_sent not in outputs
             ):
-                logging.debug(f"Hypo: -{generated_send}-")
+                logging.debug(f"Hypo: -{generated_send}- ")
                 #generated_sent = generated_sent.replace("’", "'")
                 outputs.append(generated_sent)
             else:
