@@ -92,7 +92,7 @@ def _inference(values):
         entries.append(entry)
 
     elapsed_time = time.time() - start_time
-    logging.debug(f"/paraphrase for '{text}' - time: {elapsed_time:.2f}s")
+    logging.debug(f"/paraphrase for '{text}' with '{temperature}' - time: {elapsed_time:.2f}s")
     return json_answer(entries)
 
 
