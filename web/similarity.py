@@ -42,5 +42,5 @@ class Similarity:
 
     def are_sentences_almost_identical(self, sentence1, sentence2, threshold=0.95):
         similarity = self._levenshtein_similarity(sentence1, sentence2)
-        print(f"Similarity: {similarity} {sentence1} - {sentence2}")
+        logging.debug(f"Similarity: {similarity} {sentence1} - {sentence2}")
         return similarity >= threshold
