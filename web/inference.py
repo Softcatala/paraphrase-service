@@ -3,6 +3,7 @@ import datetime
 import logging
 import ctranslate2
 import os
+from similarity import Similarity
 
 tokenizers = {}
 models = {}
@@ -25,22 +26,6 @@ class Inference:
             self.intra_threads = 4
 
         self.device = os.environ.get(self.DEVICE, "cpu")
-
-    def _discard_recommendations(self, original, proposal):
-        proposal = proposal.lower()
-        original = original.lower()
-        if proposal == original:
-            return True
-
-        chars = [".", "!", " ", "?", ","]
-        for char in chars:
-            proposal = proposal.replace(char, "")
-            original = original.replace(char, "")
-
-        if proposal == original:
-            return True
-
-        return False
 
     def get_paraphrases(
         self,
@@ -91,12 +76,13 @@ class Inference:
                 tokenizer.convert_tokens_to_ids(output_tokens)
             )
 
+
             if (
-                self._discard_recommendations(sentence, generated_sent) is False
+                Similarity().are_sentences_almost_identical(sentence, generated_sent) is False
                 and generated_sent not in outputs
             ):
                 logging.debug(f"Hypo: -{generated_sent}- ")
-                #generated_sent = generated_sent.replace("’", "'")
+                #generated_sent = generated_sent.replace("’", "'") 
                 outputs.append(generated_sent)
             else:
                 logging.debug(f"Discarded: {generated_sent} - source:{sentence}")
