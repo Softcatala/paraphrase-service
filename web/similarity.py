@@ -1,3 +1,5 @@
+import logging
+
 class Similarity:
 
     def _preprocess_sentence(self, sentence):
