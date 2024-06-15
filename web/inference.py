@@ -34,7 +34,7 @@ class Inference:
         temperature,
     ):
         prefix = "paraphrase: "
-        n_predictions = 2
+        n_predictions = 5
         top_k = 120
         max_length = 256
         device = "cpu"
@@ -76,10 +76,10 @@ class Inference:
                 tokenizer.convert_tokens_to_ids(output_tokens)
             )
 
-
             if (
-                Similarity().are_sentences_almost_identical(sentence, generated_sent) is False
-                and generated_sent not in outputs
+                Similarity().are_sentences_almost_identical(sentence, generated_sent) is False and
+               any(Similarity().are_sentences_almost_identical(generated_sent, o) for o in outputs) is False and
+                generated_sent not in outputs
             ):
 #                logging.debug(f"Hypo: -{generated_sent}- ")
                 #generated_sent = generated_sent.replace("’", "'") 
@@ -91,4 +91,5 @@ class Inference:
             if len(outputs) == n_predictions:
                 break
 
-        return outputs, discarded
+        get_first_two = outputs[0:2] if len(outputs) >= 2 else outputs
+        return get_first_two, discarded
