@@ -1,5 +1,6 @@
 import logging
 
+
 class Similarity:
 
     def _preprocess_sentence(self, sentence):
@@ -48,6 +49,5 @@ class Similarity:
         if result:
             logging.debug(f"Similarity: {similarity} {sentence1}")
             logging.debug(f"Similarity: {similarity} {sentence2}")
-
 
         return result

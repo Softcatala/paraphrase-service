@@ -81,11 +81,10 @@ class Inference:
                any(Similarity().are_sentences_almost_identical(generated_sent, o) for o in outputs) is False and
                 generated_sent not in outputs
             ):
-#                logging.debug(f"Hypo: -{generated_sent}- ")
-                #generated_sent = generated_sent.replace("’", "'") 
+                generated_sent = generated_sent.replace("’", "'")
                 outputs.append(generated_sent)
             else:
-                logging.debug(f"*** Discarded: {generated_sent} - source:{sentence}")
+                logging.debug(f"Discarded: {generated_sent} - source:{sentence}")
                 discarded = +1
 
             if len(outputs) == n_predictions:
