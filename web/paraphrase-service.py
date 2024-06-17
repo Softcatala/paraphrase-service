@@ -29,6 +29,7 @@ import time
 
 app = Flask(__name__)
 CORS(app)
+MODEL_PATH = os.environ.get("PARAPHRASE_MODELS", "/srv/model/")
 
 
 def init_logging():
@@ -52,8 +53,7 @@ def init_logging():
 
 
 def do_inference(sentence, temperature):
-    model_path = os.environ.get("PARAPHRASE_MODELS", "/srv/model/")
-    paraphrases, _ = Inference().get_paraphrases(model_path, sentence, temperature)
+    paraphrases, _ = Inference().get_paraphrases(MODEL_PATH, sentence, temperature)
     return paraphrases
 
 
@@ -92,7 +92,7 @@ def _inference(values):
         entries.append(entry)
 
     elapsed_time = time.time() - start_time
-    logging.debug(f"/paraphrase for '{text}' - time: {elapsed_time:.2f}s")
+    logging.debug(f"/paraphrase for '{text}' with '{temperature}' - time: {elapsed_time:.2f}s")
     return json_answer(entries)
 
 
@@ -109,6 +109,15 @@ def paraphrase_api_get():
 def hello():
     return "Hello"
 
+@app.route('/version/', methods=['GET'])
+def version_api():
+
+    result = []
+    filename = os.path.join(MODEL_PATH, "training-metadata.json")
+    with open(filename, "r") as th_description:
+        result = th_description.read().splitlines()
+
+    return json_answer(result)
 
 def init():
     init_logging()

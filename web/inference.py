@@ -3,6 +3,7 @@ import datetime
 import logging
 import ctranslate2
 import os
+from similarity import Similarity
 
 tokenizers = {}
 models = {}
@@ -26,22 +27,6 @@ class Inference:
 
         self.device = os.environ.get(self.DEVICE, "cpu")
 
-    def _discard_recommendations(self, original, proposal):
-        proposal = proposal.lower()
-        original = original.lower()
-        if proposal == original:
-            return True
-
-        chars = [".", "!", " ", "?", ","]
-        for char in chars:
-            proposal = proposal.replace(char, "")
-            original = original.replace(char, "")
-
-        if proposal == original:
-            return True
-
-        return False
-
     def get_paraphrases(
         self,
         model_name,
@@ -49,7 +34,7 @@ class Inference:
         temperature,
     ):
         prefix = "paraphrase: "
-        n_predictions = 2
+        n_predictions = 5
         top_k = 120
         max_length = 256
         device = "cpu"
@@ -92,8 +77,9 @@ class Inference:
             )
 
             if (
-                self._discard_recommendations(sentence, generated_sent) is False
-                and generated_sent not in outputs
+                Similarity().are_sentences_almost_identical(sentence, generated_sent) is False and
+               any(Similarity().are_sentences_almost_identical(generated_sent, o) for o in outputs) is False and
+                generated_sent not in outputs
             ):
                 generated_sent = generated_sent.replace("’", "'")
                 outputs.append(generated_sent)
@@ -104,4 +90,5 @@ class Inference:
             if len(outputs) == n_predictions:
                 break
 
-        return outputs, discarded
+        get_first_two = outputs[0:2] if len(outputs) >= 2 else outputs
+        return get_first_two, discarded
