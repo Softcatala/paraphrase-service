@@ -79,7 +79,8 @@ class Inference:
             if (
                 Similarity().are_sentences_almost_identical(sentence, generated_sent) is False and
                any(Similarity().are_sentences_almost_identical(generated_sent, o) for o in outputs) is False and
-                generated_sent not in outputs
+                generated_sent not in outputs and
+                "es pot parafrasejar" not in generated_sent
             ):
                 generated_sent = generated_sent.replace("’", "'")
                 outputs.append(generated_sent)
