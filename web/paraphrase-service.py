@@ -109,13 +109,13 @@ def paraphrase_api_get():
 def hello():
     return "Hello"
 
-@app.route('/version/', methods=['GET'])
+@app.route('/version', methods=['GET'])
 def version_api():
 
     result = []
     filename = os.path.join(MODEL_PATH, "training-metadata.json")
     with open(filename, "r") as th_description:
-        result = th_description.read().splitlines()
+         result = json.load(th_description)
 
     return json_answer(result)
 
